@@ -126,9 +126,9 @@
 #### خروجی
 برای مشاهده خروجی کافی است فایل‌های زیر را دانلود کرده و فایل HTML را در مرورگر باز کنید.
 
-[index.html](https://github.com/alirho/ngpm/blob/main/projects/chatgpt/index.html)
-[style.css](https://github.com/alirho/ngpm/blob/main/projects/chatgpt/style.css)
-[script.js](https://github.com/alirho/ngpm/blob/main/projects/chatgpt/script.js)
+[index.html](https://github.com/alirho/ngpm/blob/main/projects/v0/index.html)
+[style.css](https://github.com/alirho/ngpm/blob/main/projects/v0/style.css)
+[script.js](https://github.com/alirho/ngpm/blob/main/projects/v0/script.js)
 
 ### ابزار bolt
 ابزار [bolt]() هم مانند v0 فهم بسیار خوبی از ویژگی‌های درخواستی دارد و از لحاظ پیاده‌سازی و طراحی هم مشابه آن است و تنها تفاوت در فهم بهتر منطق RTL بودن پروژه بوده است.
