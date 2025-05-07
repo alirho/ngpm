@@ -1,0 +1,214 @@
+/* General Page Setup */
+html { height: 100%; }
+body {
+    font-family: sans-serif; margin: 0; line-height: 1.6; direction: rtl;
+    height: 100vh; display: flex; flex-direction: column;
+    /* Transition for theme change */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- Light Theme (Default) --- */
+body.theme-light {
+    background-color: #f4f4f4; color: #333;
+}
+body.theme-light .container { background-color: #f4f4f4; }
+body.theme-light .editor-pane, body.theme-light .preview-pane { background-color: #fff; border-color: #ddd; }
+body.theme-light #toolbar { background-color: #f9f9f9; border-bottom-color: #eee; }
+body.theme-light #toolbar button { background-color: #fff; border-color: #ccc; color: #333; }
+body.theme-light #toolbar button:hover { background-color: #eee; border-color: #bbb; }
+body.theme-light .preview-controls { background-color: #f9f9f9; border-bottom-color: #eee; }
+body.theme-light .preview-controls button { background-color: #fff; border-color: #ccc; color: #333; }
+body.theme-light .preview-controls button:hover { background-color: #eee; border-color: #bbb; }
+body.theme-light #markdown-input { background-color: #fdfdfd; color: #333; border-top-color: #eee;}
+body.theme-light #html-output { background-color: #fff; color: #333; }
+body.theme-light #html-output code { background-color: #eee; color: #333; }
+body.theme-light #html-output pre { background-color: #eee; color: #333; }
+body.theme-light #html-output blockquote { border-inline-start-color: #ccc; color: #666; }
+body.theme-light #html-output table, body.theme-light #html-output th, body.theme-light #html-output td { border-color: #ccc; }
+body.theme-light #html-output th { background-color: #f4f4f4; }
+body.theme-light #status-bar { background-color: #e9e9e9; border-top-color: #ccc; color: #333; }
+body.theme-light .modal-content { background-color: #fff; color: #333; }
+body.theme-light .modal-close-btn:hover { background-color: #eee; }
+body.theme-light .theme-btn { background-color: #eee; border-color: #ccc;}
+body.theme-light .theme-btn.active { background-color: #ccc; }
+body.theme-light hr { border-color: #eee; }
+body.theme-light .parser-options label { color: #333; }
+
+/* --- Dark Theme --- */
+body.theme-dark {
+    background-color: #2a2a2e; color: #ccc;
+}
+body.theme-dark .container { background-color: #2a2a2e; }
+body.theme-dark .editor-pane, body.theme-dark .preview-pane { background-color: #333337; border-color: #444; }
+body.theme-dark #toolbar { background-color: #252528; border-bottom-color: #444; }
+body.theme-dark #toolbar button { background-color: #444; border-color: #555; color: #ccc; }
+body.theme-dark #toolbar button:hover { background-color: #555; border-color: #666; }
+body.theme-dark .preview-controls { background-color: #252528; border-bottom-color: #444; }
+body.theme-dark .preview-controls button { background-color: #444; border-color: #555; color: #ccc; }
+body.theme-dark .preview-controls button:hover { background-color: #555; border-color: #666; }
+body.theme-dark #markdown-input { background-color: #2e2e32; color: #ccc; border-top-color: #444;caret-color: #eee;}
+body.theme-dark #html-output { background-color: #333337; color: #ccc; }
+body.theme-dark #html-output a { color: #60a Dff; } /* Lighter blue for links */
+body.theme-dark #html-output code { background-color: #444; color: #eee; }
+body.theme-dark #html-output pre { background-color: #2e2e32; color: #ccc; border: 1px solid #444; }
+body.theme-dark #html-output blockquote { border-inline-start-color: #555; color: #aaa; }
+body.theme-dark #html-output table, body.theme-dark #html-output th, body.theme-dark #html-output td { border-color: #555; }
+body.theme-dark #html-output th { background-color: #444; }
+body.theme-dark #status-bar { background-color: #252528; border-top-color: #444; color: #ccc; }
+body.theme-dark .modal-content { background-color: #333337; color: #ccc; border: 1px solid #444;}
+body.theme-dark .modal-close-btn:hover { background-color: #444; }
+body.theme-dark .theme-btn { background-color: #555; border-color: #666;}
+body.theme-dark .theme-btn.active { background-color: #666; }
+body.theme-dark hr { border-color: #444; }
+body.theme-dark .parser-options label { color: #ccc; }
+
+body.theme-dark #markdown-input { /* Redundant if bidi-textarea target works */
+     border-top-color: #444;
+}
+
+/* Main Container */
+.container {
+    display: flex; gap: 10px; flex-grow: 1; padding: 10px; box-sizing: border-box;
+    overflow: hidden; transition: padding 0.3s ease;
+}
+.editor-pane, .preview-pane {
+    flex: 1; border: 1px solid; /* Color from theme */ border-radius: 5px; display: flex;
+    flex-direction: column; overflow: hidden; transition: all 0.3s ease;
+}
+
+/* Preview Fullscreen Mode */
+.container.fullscreen-preview-active { padding-left: 10px; padding-right: 10px; gap: 0; }
+.container.fullscreen-preview-active .editor-pane { flex: 0 0 0; min-width: 0; opacity: 0; border: none; padding: 0; margin: 0; visibility: hidden; }
+.container.fullscreen-preview-active .preview-pane { max-width: 960px; margin-left: auto; margin-right: auto; }
+
+/* Toolbar */
+#toolbar {
+    padding: 5px 10px; border-bottom: 1px solid; display: flex;
+    flex-wrap: wrap; gap: 5px; justify-content: start;
+}
+#toolbar button {
+    padding: 5px; cursor: pointer; border: 1px solid; border-radius: 3px;
+    font-size: 14px; width: 32px; height: 32px; line-height: 1; text-align: center;
+    transition: background-color 0.2s, border-color 0.2s, opacity 0.2s; /* Add opacity transition */
+}
+/* Style for disabled buttons */
+#toolbar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--btn-disabled-bg, #eee); /* Adjust theme colors later */
+}
+body.theme-dark #toolbar button:disabled { background-color: var(--btn-disabled-bg-dark, #444); opacity: 0.4; }
+
+/* Separator AFTER formatting buttons (before Undo) */
+/* Let's target the undo button directly */
+#btn-redo {
+     margin-left: 8px;
+     padding-left: 8px;
+     border-left: 1px solid; /* Color from theme */
+     border-top-left-radius: 0;
+     border-bottom-left-radius: 0;
+}
+
+/* Separator AFTER Undo/Redo (before Settings) */
+#btn-settings {
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid; /* Color from theme */
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Separator before Settings button */
+#btn-upload {
+    margin-left: 8px; border-left: 1px solid; /* Color from theme */ padding-left: 8px;
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+}
+
+/* Preview Controls */
+.preview-controls {
+    padding: 5px 10px; border-bottom: 1px solid; /* Color from theme */ text-align: left;
+    direction: ltr; display: flex; justify-content: space-between; align-items: center;
+}
+.preview-controls .export-buttons { display: flex; gap: 5px; }
+.preview-controls .export-buttons button {
+    padding: 4px 8px; cursor: pointer; border: 1px solid; /* Color from theme */ border-radius: 3px;
+    font-size: 12px; vertical-align: middle;
+}
+.preview-controls .export-buttons button i { margin-right: 4px; }
+#toggle-fullscreen-preview {
+    padding: 5px; cursor: pointer; border: 1px solid; /* Color from theme */ border-radius: 3px;
+    font-size: 14px; width: 32px; height: 32px; line-height: 1; text-align: center;
+}
+
+/* [!] Markdown Input Textarea (Restored Original Styles) */
+#markdown-input {
+    flex-grow: 1; width: 100%; border: none; border-top: 1px solid;
+    padding: 10px; font-family: monospace; font-size: 14px; resize: none;
+    box-sizing: border-box;background
+    direction: ltr; /* Default, JS will set 'dir' attribute */
+    text-align: left; /* Default, JS will set 'dir' attribute which 'start' respects */
+    height: auto; overflow-y: scroll;
+    /* Theme colors are applied via body.theme-* selectors */
+}
+
+/* Editor & Preview Areas */
+#markdown-input {
+    flex-grow: 1; width: 100%; border: none; border-top: 1px solid; /* Color from theme */
+    padding: 10px; font-family: monospace; font-size: 14px; resize: none;
+    box-sizing: border-box; direction: ltr; text-align: start; height: auto;
+    overflow-y: scroll;
+}
+#html-output {
+    flex-grow: 1; padding: 10px; overflow-y: scroll; text-align: start;
+    box-sizing: border-box; height: auto; border: none;
+}
+#html-output > * { text-align: start; }
+#html-output li { text-align: start; }
+
+/* Status Bar */
+#status-bar {
+    padding: 5px 15px; border-top: 1px solid; /* Color from theme */ font-size: 12px;
+    text-align: right; direction: rtl; white-space: nowrap; overflow: hidden; flex-shrink: 0;
+}
+#status-bar span { margin-left: 15px; }
+#status-bar span span { margin-left: 0; }
+#status-bar span > span { font-weight: bold; margin-right: 3px; }
+
+/* Modal Styles */
+.modal { display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal.hidden { opacity: 0; visibility: hidden; }
+.modal-content { border-radius: 5px; padding: 20px 30px; border: 1px solid; width: 80%; max-width: 400px; position: relative; margin: 10% auto; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transform: translateY(-20px); transition: transform 0.3s ease; }
+.modal:not(.hidden) .modal-content { transform: translateY(0); }
+.modal-close-btn { position: absolute; top: 10px; left: 15px; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
+.modal-content h2 { margin-top: 0; }
+.modal-content hr { border: 0; height: 1px; margin: 15px 0; }
+.setting-option { margin-bottom: 15px; }
+.setting-option label { display: block; margin-bottom: 8px; font-weight: bold; }
+.theme-buttons { display: flex; gap: 10px; }
+.theme-btn { padding: 8px 15px; border: 1px solid; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+.theme-btn.active { font-weight: bold; }
+/* NEW: Parser options styling */
+.parser-options label {
+    display: block; /* Each radio button on its own line */
+    margin-bottom: 5px;
+    font-weight: normal; /* Normal weight for radio labels */
+    cursor: pointer;
+}
+.parser-options input[type="radio"] {
+    margin-left: 8px; /* Space after radio button (due to RTL body) */
+    vertical-align: middle;
+}
+
+/* Basic styling for rendered HTML in preview (mostly inherited or themed) */
+#html-output h1, #html-output h2, #html-output h3, #html-output h4, #html-output h5, #html-output h6 { margin-top: 1em; margin-bottom: 0.5em; border-bottom: none; }
+#html-output p { margin-top: 0; margin-bottom: 1em; }
+#html-output code { padding: 2px 4px; border-radius: 3px; font-family: monospace; direction: ltr; display: inline-block; }
+#html-output pre { padding: 10px; border-radius: 3px; overflow-x: auto; direction: ltr; text-align: left; margin: 1em 0; }
+#html-output blockquote { border-inline-start: 4px solid; padding-inline-start: 10px; margin: 1em 0; }
+#html-output ul, #html-output ol { padding-inline-start: 30px; margin: 1em 0; }
+#html-output li { margin-bottom: 0.3em; }
+#html-output a:hover { text-decoration: underline; }
+#html-output table { border-collapse: collapse; margin: 1em 0; width: auto; border: 1px solid; }
+#html-output th, #html-output td { border: 1px solid; padding: 8px; text-align: inherit; }
+#html-output th { font-weight: bold; }
+#html-output img { max-width: 100%; height: auto; display: block; margin: 10px auto; }

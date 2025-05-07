@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویرایشگر Markdown</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Import Vazirmatn Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+    <!-- Import Marked library for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Import Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button data-tooltip="پررنگ" data-format="bold"><i data-lucide="bold"></i></button>
+                <button data-tooltip="کج" data-format="italic"><i data-lucide="italic"></i></button>
+                <button data-tooltip="عنوان" data-format="heading"><i data-lucide="heading"></i></button>
+                <button data-tooltip="خط خورده" data-format="strike"><i data-lucide="strikethrough"></i></button>
+            </div>
+             <div class="separator"></div>
+             <div class="toolbar-group">
+                <button data-tooltip="لیست نامرتب" data-format="ul"><i data-lucide="list"></i></button>
+                <button data-tooltip="لیست مرتب" data-format="ol"><i data-lucide="list-ordered"></i></button>
+                <button data-tooltip="بازبینه" data-format="checklist"><i data-lucide="check-square"></i></button>
+            </div>
+             <div class="separator"></div>
+             <div class="toolbar-group">
+                <button data-tooltip="نقل‌قول" data-format="blockquote"><i data-lucide="quote"></i></button>
+                <button data-tooltip="کد" data-format="code"><i data-lucide="code"></i></button>
+                <button data-tooltip="جدول" data-format="table"><i data-lucide="table"></i></button>
+            </div>
+            <div class="separator"></div>
+            <div class="toolbar-group">
+                <button data-tooltip="عکس" data-format="image"><i data-lucide="image"></i></button>
+                <button data-tooltip="پیوند" data-format="link"><i data-lucide="link"></i></button>
+            </div>
+            <div class="separator"></div>
+            <div class="toolbar-group export-group">
+                <button data-tooltip="خروجی Markdown" id="export-md"><i data-lucide="download"></i> MD</button>
+                <button data-tooltip="خروجی HTML" id="export-html"><i data-lucide="download"></i> HTML</button>
+            </div>
+        </div>
+
+        <!-- Editor and Preview Panels -->
+        <div class="editor-container">
+            <!-- Write Panel (Right) - This is the scrollable container -->
+            <div class="panel write-panel">
+                <textarea id="editor" placeholder="اینجا بنویسید..." dir="auto"></textarea>
+            </div>
+
+            <!-- Preview Panel (Left) - This is the scrollable container -->
+            <div class="panel preview-panel">
+                <div id="preview" class="preview-content"></div>
+            </div>
+        </div>
+
+        <!-- Statistics Bar -->
+        <div class="stats-bar">
+            <span>نویسه: <span id="stat-chars">0</span></span>
+            <span>حروف: <span id="stat-letters">0</span></span>
+            <span>واژه‌ها: <span id="stat-words">0</span></span>
+            <span>خط: <span id="stat-lines">0</span></span>
+            <span>حجم: <span id="stat-size">0 B</span></span>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

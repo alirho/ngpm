@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پارسی‌نگار | ویرایشگر markdown</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    </head>
+<body class="theme-light"> <div class="container">
+        <div class="editor-pane">
+            <div id="toolbar">
+                <button id="btn-settings" title="تنظیمات"><i class="fa-solid fa-gear"></i></button>
+                <button id="btn-upload" title="بارگذاری فایل (.md, .txt)"><i class="fa-solid fa-folder-open"></i></button>
+                <button id="btn-undo" title="واگرد (Ctrl+Z)" disabled><i class="fa-solid fa-rotate-right"></i></button>
+                <button id="btn-redo" title="ازنو (Ctrl+Y)" disabled><i class="fa-solid fa-rotate-left"></i></button>
+                <button id="btn-bold" title="پررنگ کردن (Bold)"><i class="fa-solid fa-bold"></i></button>
+                <button id="btn-italic" title="کج کردن (Italic)"><i class="fa-solid fa-italic"></i></button>
+                <button id="btn-heading" title="عنوان (Heading)"><i class="fa-solid fa-heading"></i></button>
+                <button id="btn-strike" title="خط زدن (Strikethrough)"><i class="fa-solid fa-strikethrough"></i></button>
+                <button id="btn-ul" title="لیست نامرتب (Unordered List)"><i class="fa-solid fa-list-ul"></i></button>
+                <button id="btn-ol" title="لیست مرتب (Ordered List)"><i class="fa-solid fa-list-ol"></i></button>
+                <button id="btn-checklist" title="بازبینه (Checklist)"><i class="fa-solid fa-list-check"></i></button>
+                <button id="btn-quote" title="نقل‌قول (Blockquote)"><i class="fa-solid fa-quote-right"></i></button>
+                <button id="btn-code" title="کد (Code)"><i class="fa-solid fa-code"></i></button>
+                <button id="btn-table" title="جدول (Table)"><i class="fa-solid fa-table"></i></button>
+                <button id="btn-image" title="عکس (Image)"><i class="fa-solid fa-image"></i></button>
+                <button id="btn-link" title="پیوند (Link)"><i class="fa-solid fa-link"></i></button>
+            </div>
+            <textarea id="markdown-input" placeholder="مارک‌داون خود را اینجا بنویسید..."></textarea>
+        </div>
+
+        <div class="preview-pane">
+             <div class="preview-controls">
+                <div class="export-buttons">
+                    <button id="export-md" title="خروجی Markdown (.md)"><i class="fa-solid fa-file-arrow-down"></i> MD</button>
+                    <button id="export-html" title="خروجی HTML (.html)"><i class="fa-solid fa-file-code"></i> HTML</button>
+                </div>
+                <button id="toggle-fullscreen-preview" title="نمایش تمام صفحه پیش‌نمایش"><i class="fa-solid fa-expand"></i></button>
+            </div>
+            <div id="html-output"></div>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <span>نویسه‌ها: <span id="char-count">0</span></span>
+        <span>حروف: <span id="letter-count">0</span></span>
+        <span>واژه‌ها: <span id="word-count">0</span></span>
+        <span>خط‌ها: <span id="line-count">0</span></span>
+        <span>حجم: <span id="size-count">0</span> بایت</span>
+    </div>
+
+    <input type="file" id="file-input" accept=".md,.txt" style="display: none;">
+
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="modal-close-btn" id="modal-close">&times;</span>
+        <h2>تنظیمات</h2>
+        <hr>
+        <div class="setting-option">
+          <label>پوسته برنامه:</label>
+          <div class="theme-buttons">
+             <button data-theme="light" class="theme-btn active">روشن</button>
+             <button data-theme="dark" class="theme-btn">تاریک</button>
+          </div>
+        </div>
+        <hr>
+        <div class="setting-option">
+          <label>مفسر مارک‌داون:</label>
+          <div class="parser-options">
+            <label>
+              <input type="radio" name="parser" value="marked" checked> Marked
+            </label>
+            <label>
+              <input type="radio" name="parser" value="shahneshan"> ShahNeshan
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویرایشگر Markdown فارسی</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-direction: row;
+        }
+        
+        .editor-section, .preview-section {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-section {
+            background-color: #fff;
+            border-left: 1px solid #ddd;
+            order: 2; /* این بخش را به سمت راست می‌برد */
+        }
+        
+        .preview-section {
+            background-color: #f9f9f9;
+            order: 1; /* این بخش را به سمت چپ می‌برد */
+        }
+        
+        .editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .editor-toolbar button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .editor-toolbar button:hover {
+            background-color: #45a049;
+        }
+        
+        .download-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            resize: none;
+            background-color: #fff;
+        }
+        
+        #preview {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            overflow-y: auto;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+        }
+        
+        blockquote {
+            border-right: 4px solid #4CAF50;
+            background-color: #f8f8f8;
+            padding: 10px 20px;
+            margin: 0 0 20px;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: right;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="preview-section">
+            <div class="download-toolbar">
+                <button id="download-md">دانلود به صورت Markdown</button>
+                <button id="download-html">دانلود به صورت HTML</button>
+            </div>
+            <div id="preview"></div>
+        </div>
+        <div class="editor-section">
+            <div class="editor-toolbar">
+                <button data-action="bold">پررنگ</button>
+                <button data-action="italic">کج</button>
+                <button data-action="heading">عنوان</button>
+                <button data-action="strike">خط‌خورده</button>
+                <button data-action="ulist">لیست نامرتب</button>
+                <button data-action="olist">لیست مرتب</button>
+                <button data-action="checklist">چک‌لیست</button>
+                <button data-action="quote">نقل‌قول</button>
+                <button data-action="code">کد</button>
+                <button data-action="table">جدول</button>
+                <button data-action="image">عکس</button>
+                <button data-action="link">پیوند</button>
+            </div>
+            <textarea id="editor" placeholder="متن Markdown خود را اینجا بنویسید..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            const downloadMdBtn = document.getElementById('download-md');
+            const downloadHtmlBtn = document.getElementById('download-html');
+            
+            // Update preview on input
+            editor.addEventListener('input', updatePreview);
+            
+            // Initial preview update
+            updatePreview();
+            
+            // Toolbar buttons functionality
+            document.querySelectorAll('.editor-toolbar button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    insertMarkdown(action);
+                });
+            });
+            
+            // Download buttons functionality
+            downloadMdBtn.addEventListener('click', downloadMarkdown);
+            downloadHtmlBtn.addEventListener('click', downloadHTML);
+            
+            function updatePreview() {
+                const markdownText = editor.value;
+                preview.innerHTML = parseMarkdown(markdownText);
+            }
+            
+            function insertMarkdown(action) {
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                const selectedText = editor.value.substring(start, end);
+                let insertText = '';
+                let cursorOffset = 0;
+                
+                switch(action) {
+                    case 'bold':
+                        insertText = `**${selectedText}**`;
+                        cursorOffset = selectedText ? 0 : 2;
+                        break;
+                    case 'italic':
+                        insertText = `*${selectedText}*`;
+                        cursorOffset = selectedText ? 0 : 1;
+                        break;
+                    case 'heading':
+                        insertText = `# ${selectedText}`;
+                        cursorOffset = selectedText ? 0 : 2;
+                        break;
+                    case 'strike':
+                        insertText = `~~${selectedText}~~`;
+                        cursorOffset = selectedText ? 0 : 2;
+                        break;
+                    case 'ulist':
+                        insertText = `- ${selectedText}`;
+                        cursorOffset = selectedText ? 0 : 2;
+                        break;
+                    case 'olist':
+                        insertText = `1. ${selectedText}`;
+                        cursorOffset = selectedText ? 0 : 3;
+                        break;
+                    case 'checklist':
+                        insertText = `- [ ] ${selectedText}`;
+                        cursorOffset = selectedText ? 0 : 6;
+                        break;
+                    case 'quote':
+                        insertText = `> ${selectedText}`;
+                        cursorOffset = selectedText ? 0 : 2;
+                        break;
+                    case 'code':
+                        if (selectedText.includes('\n')) {
+                            insertText = "```\n" + selectedText + "\n```";
+                            cursorOffset = selectedText ? 0 : 4;
+                        } else {
+                            insertText = "`" + selectedText + "`";
+                            cursorOffset = selectedText ? 0 : 1;
+                        }
+                        break;
+                    case 'table':
+                        insertText = `| سرفصل | سرفصل |\n| ------ | ------ |\n| سلول   | سلول   |\n| سلول   | سلول   |`;
+                        cursorOffset = 0;
+                        break;
+                    case 'image':
+                        insertText = `![متن جایگزین](${selectedText || 'آدرس-تصویر'})`;
+                        cursorOffset = selectedText ? 0 : 15;
+                        break;
+                    case 'link':
+                        insertText = `[متن پیوند](${selectedText || 'آدرس-پیوند'})`;
+                        cursorOffset = selectedText ? 0 : 12;
+                        break;
+                }
+                
+                // Insert the markdown syntax
+                editor.value = editor.value.substring(0, start) + insertText + editor.value.substring(end);
+                
+                // Set cursor position
+                if (selectedText) {
+                    editor.selectionStart = start;
+                    editor.selectionEnd = start + insertText.length;
+                } else {
+                    editor.selectionStart = start + insertText.length - cursorOffset;
+                    editor.selectionEnd = editor.selectionStart;
+                }
+                
+                editor.focus();
+                updatePreview();
+            }
+            
+            function downloadMarkdown() {
+                const content = editor.value;
+                downloadFile(content, 'markdown.md', 'text/markdown');
+            }
+            
+            function downloadHTML() {
+                const content = `<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سند Markdown</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+        }
+        blockquote {
+            border-right: 4px solid #4CAF50;
+            background-color: #f8f8f8;
+            padding: 10px 20px;
+            margin: 0 0 20px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    ${parseMarkdown(editor.value)}
+</body>
+</html>`;
+                downloadFile(content, 'document.html', 'text/html');
+            }
+            
+            function downloadFile(content, filename, type) {
+                const blob = new Blob([content], { type });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            // Enhanced Markdown parser
+            function parseMarkdown(markdown) {
+                // Headers
+                markdown = markdown.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+                markdown = markdown.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+                markdown = markdown.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+                markdown = markdown.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
+                markdown = markdown.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
+                markdown = markdown.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
+                
+                // Bold and Italic
+                markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                markdown = markdown.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                markdown = markdown.replace(/_(.*?)_/g, '<em>$1</em>');
+                
+                // Strikethrough
+                markdown = markdown.replace(/~~(.*?)~~/g, '<del>$1</del>');
+                
+                // Links
+                markdown = markdown.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+                
+                // Images
+                markdown = markdown.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+                
+                // Blockquotes
+                markdown = markdown.replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>');
+                
+                // Ordered Lists
+                markdown = markdown.replace(/^\d+\. (.*$)/gm, function(match, p1) {
+                    return '<li>' + p1 + '</li>';
+                });
+                
+                // Unordered Lists
+                markdown = markdown.replace(/^[-*+] (.*$)/gm, function(match, p1) {
+                    return '<li>' + p1 + '</li>';
+                });
+                
+                // Wrap lists in ul/ol tags
+                markdown = markdown.replace(/(<li>.*<\/li>)+/g, function(match) {
+                    if (match.match(/^\d+\./m)) {
+                        return '<ol>' + match + '</ol>';
+                    } else {
+                        return '<ul>' + match + '</ul>';
+                    }
+                });
+                
+                // Checklists
+                markdown = markdown.replace(/^- \[ \] (.*$)/gm, '<li><input type="checkbox"> $1</li>');
+                markdown = markdown.replace(/^- \[x\] (.*$)/gm, '<li><input type="checkbox" checked> $1</li>');
+                
+                // Code blocks
+                markdown = markdown.replace(/```([a-z]*)\n([\s\S]*?)```/g, function(match, p1, p2) {
+                    return '<pre><code class="' + p1 + '">' + p2 + '</code></pre>';
+                });
+                
+                // Inline code
+                markdown = markdown.replace(/`(.*?)`/g, '<code>$1</code>');
+                
+                // Tables
+                markdown = markdown.replace(/(\|.+\|.+\n\|[-: ]+[-| :]+\n(?:\|.+\n)+)/g, function(match) {
+                    const rows = match.trim().split('\n');
+                    let html = '<table>';
+                    
+                    // Header row
+                    const headers = rows[0].split('|').filter(x => x.trim() !== '');
+                    html += '<thead><tr>';
+                    headers.forEach(header => {
+                        html += '<th>' + header.trim() + '</th>';
+                    });
+                    html += '</tr></thead>';
+                    
+                    // Body rows
+                    html += '<tbody>';
+                    for (let i = 2; i < rows.length; i++) {
+                        const cells = rows[i].split('|').filter(x => x.trim() !== '');
+                        html += '<tr>';
+                        cells.forEach(cell => {
+                            html += '<td>' + cell.trim() + '</td>';
+                        });
+                        html += '</tr>';
+                    }
+                    html += '</tbody></table>';
+                    
+                    return html;
+                });
+                
+                // Horizontal rule
+                markdown = markdown.replace(/^[-*_]{3,}$/gm, '<hr>');
+                
+                // Paragraphs (handle remaining text)
+                markdown = markdown.replace(/^(?!<[a-z]|<\/[a-z])(.*$)/gm, function(m) {
+                    return m.trim() ? '<p>' + m + '</p>' : '';
+                });
+                
+                return markdown;
+            }
+        });
+    </script>
+</body>
+</html>

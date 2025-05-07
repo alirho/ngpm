@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ویرایشگر مارک‌داون فارسی</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="buttons">
+      <button title="پررنگ" data-action="bold">B</button>
+      <button title="کج" data-action="italic">I</button>
+      <button title="عنوان" data-action="heading">H</button>
+      <button title="خط خورده" data-action="strike">S</button>
+      <button title="لیست نامرتب" data-action="ul">•</button>
+      <button title="لیست مرتب" data-action="ol">1.</button>
+      <button title="چک‌لیست" data-action="checklist">☑</button>
+      <button title="نقل‌قول" data-action="quote">❝</button>
+      <button title="کد" data-action="code">&lt;/&gt;</button>
+      <button title="جدول" data-action="table">☰</button>
+      <button title="تصویر" data-action="image">🖼️</button>
+      <button title="پیوند" data-action="link">🔗</button>
+    </div>
+    <div class="right-tools">
+      <button id="download-md" title="دانلود Markdown">⬇️ MD</button>
+      <button id="download-html" title="دانلود HTML">⬇️ HTML</button>
+      <button id="settings-btn" title="تنظیمات">⚙️</button>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-settings">&times;</span>
+      <h2>تنظیمات</h2>
+      <label>فونت:
+        <select id="font-select">
+          <option value="vazirmatn">وزیرمتن</option>
+          <option value="iranianSans">IranianSans</option>
+        </select>
+      </label>
+      <label>تم:
+        <select id="theme-select">
+          <option value="light">روشن</option>
+          <option value="dark">تاریک</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="editor-preview">
+    <textarea id="editor" placeholder="محتوای مارک‌داون را اینجا بنویسید..."></textarea>
+    <div id="preview"></div>
+  </div>
+
+  <input type="file" id="file-input" accept=".md,.txt" style="display: none;" />
+  <button id="upload-btn" title="بارگذاری فایل">📂</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
