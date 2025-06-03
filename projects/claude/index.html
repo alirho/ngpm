@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویرایشگر مارک‌دوان فارسی</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .editor-card {
+            background: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.875rem;
+            min-width: 44px;
+            min-height: 44px;
+            position: relative;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Hide all text spans in buttons */
+        .btn span {
+            display: none;
+        }
+
+        /* Show text spans only on hover as tooltips */
+        .btn:hover span {
+            display: block;
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Arrow for tooltip */
+        .btn:hover span::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-bottom-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .editor-container {
+            display: flex;
+            height: calc(100vh - 120px);
+            min-height: 600px;
+        }
+
+        .editor-panel, .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: none;
+        }
+
+        .editor-textarea {
+            flex: 1;
+            padding: 1.5rem;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            background: #f8fafc;
+            transition: background-color 0.3s ease;
+        }
+
+        .editor-textarea:focus {
+            background: white;
+        }
+
+        .preview-panel {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: white;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .footer {
+            background: #f8fafc;
+            padding: 1rem 2rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Markdown Styling */
+        .preview-content h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1.5rem 0 1rem;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+
+        .preview-content h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1.25rem 0 0.75rem;
+            color: #374151;
+        }
+
+        .preview-content h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 1rem 0 0.5rem;
+            color: #4b5563;
+        }
+
+        .preview-content p {
+            margin: 0.75rem 0;
+            line-height: 1.7;
+        }
+
+        .preview-content strong {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .preview-content em {
+            font-style: italic;
+            color: #4b5563;
+        }
+
+        .preview-content code {
+            background-color: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #dc2626;
+        }
+
+        .preview-content pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .preview-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .preview-content a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .preview-content a:hover {
+            color: #1d4ed8;
+        }
+
+        .preview-content blockquote {
+            border-right: 4px solid #e5e7eb;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #6b7280;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+        }
+
+        .preview-content ul, .preview-content ol {
+            margin: 1rem 0;
+            padding-right: 2rem;
+        }
+
+        .preview-content li {
+            margin: 0.5rem 0;
+        }
+
+        .preview-content hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 2rem 0;
+        }
+
+        .preview-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+            border: 1px solid #d1d5db;
+        }
+
+        .preview-content td, .preview-content th {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            text-align: right;
+        }
+
+        .preview-content th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .preview-content tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .preview-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .editor-panel, .preview-panel {
+                min-height: 300px;
+            }
+            
+            .toolbar {
+                gap: 0.25rem;
+            }
+            
+            .btn {
+                padding: 0.5rem;
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-card">
+            <!-- Header -->
+            <div class="header">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="btn" id="togglePreview">
+                        <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span id="previewText">مخفی کردن پیش‌نمایش</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('**', '**', 'متن پررنگ')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+                            <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+                        </svg>
+                        <span>پررنگ</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('*', '*', 'متن کج')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="4" x2="10" y2="4"/>
+                            <line x1="14" y1="20" x2="5" y2="20"/>
+                            <line x1="15" y1="4" x2="9" y2="20"/>
+                        </svg>
+                        <span>کج</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('`', '`', 'کد')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16,18 22,12 16,6"/>
+                            <polyline points="8,6 2,12 8,18"/>
+                        </svg>
+                        <span>کد</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('[', '](لینک)', 'متن لینک')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span>لینک</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('![', '](آدرس-تصویر)', 'توضیح تصویر')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                        <span>تصویر</span>
+                    </button>
+                    
+                    <button class="btn" onclick="insertText('\n> ', '', 'نقل قول')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18v-6l3-4 3 4v6"/>
+                            <path d="M3 18v-6l3-4 3 4v6"/>
+                        </svg>
+                        <span>نقل قول</span>
+                    </button>
+                    
+                    <button class="btn" id="copyBtn">
+                        <svg id="copyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span id="copyText">کپی</span>
+                    </button>
+                    
+                    <button class="btn" id="downloadBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span>دانلود</span>
+                    </button>
+                    
+                    <label for="fileInput" class="btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                        <span>بارگذاری</span>
+                        <input type="file" id="fileInput" class="file-input" accept=".md,.markdown">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="editor-container">
+                <!-- Markdown Input -->
+                <div class="editor-panel">
+                    <div class="panel-header"></div>
+                    <textarea id="markdownTextarea" class="editor-textarea" placeholder="شروع به نوشتن کنید..."># ویرایشگر مارک‌دوان فارسی
+
+## خوش آمدید!
+
+این یک ویرایشگر مارک‌دوان کامل با پشتیبانی از **زبان فارسی** است.
+
+### امکانات:
+- **متن پررنگ** و *متن کج*
+- `کد تک خطی`
+- [لینک](https://example.com)
+- فهرست‌ها:
+  1. مورد اول
+  2. مورد دوم
+  3. مورد سوم
+
+### بلوک کد:
+```javascript
+function hello() {
+  console.log("سلام دنیا!");
+}
+```
+
+> این یک نقل قول است.
+> می‌توانید چندین خط داشته باشید.
+
+---
+
+### جدول نمونه:
+
+| نام | سن | شهر |
+|-----|-----|-----|
+| علی | 25 | تهران |
+| فاطمه | 30 | اصفهان |
+| حسن | 28 | شیراز |
+
+### تصاویر:
+![تصویر نمونه](https://via.placeholder.com/300x200?text=تصویر+نمونه)
+
+**شروع به نوشتن کنید!** 🚀</textarea>
+                </div>
+
+                <!-- Preview -->
+                <div class="preview-panel" id="previewPanel">
+                    <div class="panel-header"></div>
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div>تعداد کلمات: <span id="wordCount">0</span></div>
+                <div>تعداد کاراکترها: <span id="charCount">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let showPreview = true;
+        let markdown = '';
+
+        // DOM Elements
+        const markdownTextarea = document.getElementById('markdownTextarea');
+        const previewContent = document.getElementById('previewContent');
+        const previewPanel = document.getElementById('previewPanel');
+        const togglePreviewBtn = document.getElementById('togglePreview');
+        const previewText = document.getElementById('previewText');
+        const eyeIcon = document.getElementById('eyeIcon');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyText = document.getElementById('copyText');
+        const copyIcon = document.getElementById('copyIcon');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+
+        // Convert markdown to HTML
+        function convertMarkdownToHtml(text) {
+            let html = text;
+            
+            // Headers
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            
+            // Bold and Italic
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Code blocks
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>');
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Links
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            
+            // Images
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+            
+            // Tables
+            const lines = html.split('\n');
+            let inTable = false;
+            let tableHtml = '';
+            let processedLines = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.includes('|') && line.split('|').length > 2) {
+                    if (!inTable) {
+                        inTable = true;
+                        tableHtml = '<table>';
+                    }
+                    
+                    const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+                    
+                    // Skip header separator line
+                    if (cells.every(cell => /^-+$/.test(cell))) {
+                        continue;
+                    }
+                    
+                    const isHeaderRow = i === 0 || (i > 0 && !lines[i-1].includes('|'));
+                    const cellTag = isHeaderRow ? 'th' : 'td';
+                    
+                    tableHtml += '<tr>';
+                    cells.forEach(cell => {
+                        tableHtml += `<${cellTag}>${cell}</${cellTag}>`;
+                    });
+                    tableHtml += '</tr>';
+                } else {
+                    if (inTable) {
+                        tableHtml += '</table>';
+                        processedLines.push(tableHtml);
+                        tableHtml = '';
+                        inTable = false;
+                    }
+                    processedLines.push(line);
+                }
+            }
+            
+            if (inTable) {
+                tableHtml += '</table>';
+                processedLines.push(tableHtml);
+            }
+            
+            html = processedLines.join('\n');
+            
+            // Lists
+            html = html.replace(/^\d+\.\s(.*)$/gim, '<li>$1</li>');
+            html = html.replace(/^-\s(.*)$/gim, '<li>$1</li>');
+            
+            // Wrap consecutive list items
+            html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => {
+                const isOrdered = /^\d+\./.test(match);
+                const tag = isOrdered ? 'ol' : 'ul';
+                return `<${tag}>${match}</${tag}>`;
+            });
+            
+            // Blockquotes
+            html = html.replace(/^> (.*)$/gim, '<blockquote>$1</blockquote>');
+            
+            // Horizontal rule
+            html = html.replace(/^---$/gim, '<hr>');
+            
+            // Line breaks
+            html = html.replace(/\n/g, '<br>');
+            
+            return html;
+        }
+
+        // Update preview
+        function updatePreview() {
+            markdown = markdownTextarea.value;
+            if (showPreview) {
+                previewContent.innerHTML = convertMarkdownToHtml(markdown);
+            }
+            updateStats();
+        }
+
+        // Update word and character count
+        function updateStats() {
+            const words = markdown.split(/\s+/).filter(word => word.length > 0).length;
+            wordCount.textContent = words;
+            charCount.textContent = markdown.length;
+        }
+
+        // Insert text helper
+        function insertText(before, after = '', placeholder = '') {
+            const start = markdownTextarea.selectionStart;
+            const end = markdownTextarea.selectionEnd;
+            const selectedText = markdown.substring(start, end) || placeholder;
+            const newText = markdown.substring(0, start) + before + selectedText + after + markdown.substring(end);
+            
+            markdownTextarea.value = newText;
+            markdownTextarea.focus();
+            markdownTextarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+            
+            updatePreview();
+        }
+
+        // Toggle preview
+        function togglePreview() {
+            showPreview = !showPreview;
+            
+            if (showPreview) {
+                previewPanel.classList.remove('hidden');
+                previewText.textContent = 'مخفی کردن پیش‌نمایش';
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+                updatePreview();
+            } else {
+                previewPanel.classList.add('hidden');
+                previewText.textContent = 'نمایش پیش‌نمایش';
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            }
+        }
+
+        // Copy to clipboard
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(markdown);
+                copyText.textContent = 'کپی شد!';
+                copyIcon.innerHTML = '<polyline points="20,6 9,17 4,12"/>';
+                
+                setTimeout(() => {
+                    copyText.textContent = 'کپی';
+                    copyIcon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+        }
+
+        // Download markdown
+        function downloadMarkdown() {
+            const element = document.createElement('a');
+            const file = new Blob([markdown], { type: 'text/markdown' });
+            element.href = URL.createObjectURL(file);
+            element.download = 'document.md';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // Upload markdown
+        function uploadMarkdown(event) {
+            const file = event.target.files[0];
+            if (file && (file.type === 'text/markdown' || file.name.endsWith('.md'))) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    markdownTextarea.value = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Scroll synchronization
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function syncScroll(source, target) {
+            if (isScrolling) return;
+            
+            isScrolling = true;
+            
+            const sourceScrollTop = source.scrollTop;
+            const sourceScrollHeight = source.scrollHeight - source.clientHeight;
+            const scrollPercentage = sourceScrollHeight > 0 ? sourceScrollTop / sourceScrollHeight : 0;
+            
+            const targetScrollHeight = target.scrollHeight - target.clientHeight;
+            const targetScrollTop = scrollPercentage * targetScrollHeight;
+            
+            target.scrollTop = targetScrollTop;
+            
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 100);
+        }
+
+        // Event listeners
+        markdownTextarea.addEventListener('input', updatePreview);
+        markdownTextarea.addEventListener('scroll', () => {
+            if (showPreview) {
+                syncScroll(markdownTextarea, previewContent);
+            }
+        });
+        
+        previewContent.addEventListener('scroll', () => {
+            if (showPreview) {
+                syncScroll(previewContent, markdownTextarea);
+            }
+        });
+        
+        togglePreviewBtn.addEventListener('click', togglePreview);
+        copyBtn.addEventListener('click', copyToClipboard);
+        downloadBtn.addEventListener('click', downloadMarkdown);
+        fileInput.addEventListener('change', uploadMarkdown);
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>
